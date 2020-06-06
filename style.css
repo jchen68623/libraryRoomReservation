@@ -1,0 +1,67 @@
+@charset "UTF-8";
+
+body{
+	margin: 15px;
+	background: lightgrey;
+}
+
+form{
+	border: 2px solid black;
+	margin: 10px;
+	padding: 10px;
+	background: lightblue;
+}
+
+label {
+	width: 200px;
+	display: inline-block;
+	text-align: left;
+}
+
+
+table, th, td {
+  border: 1px solid black;
+  margin: 20px;
+}
+
+tr:nth-child(even) {background-color: #f2f2f2;}
+tr:nth-child(odd) {background-color: lightgrey;}
+
+th{
+	padding: 15px;
+}
+
+td{
+	text-align:center;
+	padding: 5px;
+}
+
+button{
+	font-size: 13px;
+}
+
+.dateLabel {
+	width: 30px;
+	display: inline-block;
+	text-align: left;
+}
+
+.receipt {
+	background: lightblue;
+	height: 220px;
+	width: 400px;
+	padding: 20px;
+	margin: 10px;
+	border: outset aqua 4pt;
+	font-family: arial, sans serif;
+	font-size: 0.9em;
+}
+
+.roomsGrid {
+	border: 3px solid blue;
+	background: lightyellow;
+	margin: 10px;
+	padding: 10px;
+}
+
+}

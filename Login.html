@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<link rel="stylesheet" type="text/css" href="style.css" />
+<title>CSC338 Library - Login</title>
+</head>
+<body>
+
+<h2>Login</h2>
+
+<form action="checkStudent.php" method="post">
+<label for="studentId">Student ID:</label>
+<input type="text" name="studentId" required><br><br>
+<label for="pass">Password:</label>
+<input type="password" name="pass" required><br><br>
+
+<input type="submit" id="login" value="Login">
+</form>
+
+
+No account? <a href="signup.html">Sign up</a>
+
+</body>
+
+<script>
+checkLoggedIn();
+
+function checkLoggedIn(){
+	var ajax = new XMLHttpRequest();
+	ajax.open("GET","checkLoggedIn.php",true);
+	ajax.send();
+	ajax.onreadystatechange = function (){
+		if(ajax.readyState == 4 && ajax.status == 200){
+			if(ajax.responseText == "true"){
+				document.location.href = "homePage.html";
+			}
+		}
+	};
+}
+
+</script>
+
+</html>

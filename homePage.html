@@ -1,0 +1,227 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<link rel="stylesheet" type="text/css" href="style.css" />
+<title>CSC338 Library - HomePage</title>
+</head>
+<body>
+
+<button onclick="location.href = 'logout.php'">Log Out</button>
+<div id="hi"></div>
+
+<h2> CSC338 Library Room Booking</h2>
+<form onsubmit="return check(this)" action="bookingreceipt.php" method="post">
+<label for="date">Date: </label>
+<select id="date" name="date"required>
+		<option value="" selected="selected">-Select-</option>
+		<option value="today">Today</option>
+		<option value="tomorrow">Tomorrow</option>
+		<option value="day after tomorrow">Day after tomorrow</option>
+</select>
+<br><br>
+
+<label for="time1">Start time:</label>
+<input type="text" id="time1" name="time1" pattern="[0-9]{1,}"required>
+<select id="ampmtime1" name="ampmtime1"required>
+		<option value="am">am</option>
+		<option value="pm">pm</option>
+</select>
+<br><br>
+
+<label for="time2">End time:</label>
+<input type="text" id="time2" name="time2" pattern="[0-9]{1,}" required>
+<select id="ampmtime2" name="ampmtime2"required>
+		<option value="am">am</option>
+		<option value="pm">pm</option>
+</select>
+<br><br>
+
+<label for="roomNum">Room's Name:</label>
+<input type="text" id="roomName" name="roomName" required><br><br>
+
+<input type="submit" id="book" value="Book">
+</form>
+
+<div class="roomsGrid">
+<h3><u>Available Rooms and Dates</u></h3>
+<div id="availRooms">
+</div>
+</div>
+
+<script>
+var output = document.getElementById("availRooms");
+availRooms();
+callName();
+
+function callName(){
+	var ajax = new XMLHttpRequest();
+	ajax.open("GET","showSID.php",true);
+	ajax.send();
+	ajax.onreadystatechange = function (){
+		if(ajax.readyState == 4 && ajax.status == 200){
+			str = "<h2>Hi "+ajax.responseText+"!<h2>";
+			document.getElementById("hi").innerHTML = str;
+		}
+	};
+}
+
+
+function availRooms(){
+	var ajax = new XMLHttpRequest();
+	ajax.open("GET","checkRoomAvail.php",true);
+	ajax.send();
+	ajax.onreadystatechange = function (){
+		if(ajax.readyState == 4 && ajax.status == 200){
+			var data = JSON.parse(ajax.responseText);
+			roomsName = data[0];
+			roomType = data[1];
+			str = "<br><button onclick=\"showAllReservations()\">Show all reservations</button>"+
+				  "<br><br><table><tr><th>Room Name</th><th>Room type</th><th></th><th>Check Availability</th><th></th></tr>";
+			
+			for(i=0;i<roomsName.length;i++){
+				var room = roomsName[i];
+				str += "<tr><td>"+roomsName[i]+"</td><td>"+roomType[i]+"</td><td>"+
+					   "<button onclick='showTodayAvailability(\""+room+"\")'>Show availability Today</button>"+
+					   "</td><td><button onclick='showTomorrowAvailability(\""+room+"\")'>Show availability Tomorrow</button>"+
+					   "</td><td><button onclick='showTheDayAfterTomorrowAvailability(\""+room+"\")'>Show availability day after tomorrow</button></td></tr>";
+			}
+			str +="</table>";
+			output.innerHTML = str;
+		}
+	}
+}
+
+
+function check(){
+	var startTime = document.getElementById("time1");
+	var endTime = document.getElementById("time2");
+	if(Math.floor(startTime.value) > 12){
+		alert ("\nPlease set time in 12-hour system.") 
+		return false;
+	}
+	if(Math.floor(endTime.value) > 12){
+		alert ("\nPlease set time in 12-hour system.") 
+		return false;
+	}
+}
+
+
+function showTodayAvailability(roomName){
+	//var userInput = document.getElementById("input").value;
+	var ajax = new XMLHttpRequest();
+	ajax.open("GET", "showAvailability.php?date=Today", true);
+	ajax.send();
+	ajax.onreadystatechange = function(){
+		if(ajax.readyState == 4 && ajax.status == 200){
+			var array = JSON.parse(ajax.responseText);
+			var countKey = Object.keys(array).length;
+			str = "<br><button onclick='availRooms()'>Back</button><h3>Availability for today</h3>";
+			str += "<table><tr><th>Room Name</th><th>Start Time</th><th>End Time</th><th>Availability</th></tr>";
+			for (var i = 0; i < countKey; i++) {
+				if(array[i]["room_name"] == roomName){
+					str += "<tr>";
+					str += "<td>" + array[i]["room_name"] + "</td><td>" + array[i]["start_time"] + 
+					":00  </td><td>" + array[i]["end_time"] + ":00  </td><td>" + array[i]["available"]
+					+ "</td>";
+					str += "</tr>";
+				}
+			}
+			str += "</table>";
+			
+			output.innerHTML = str;
+			//document.getElementById("divToChange").innerHTML = array;
+		}
+	};
+}
+
+function showTomorrowAvailability(roomName){
+	//var userInput = document.getElementById("input").value;
+	var ajax = new XMLHttpRequest();
+	ajax.open("GET", "showAvailability.php?date=Tomorrow", true);
+	ajax.send();
+	ajax.onreadystatechange = function(){
+		if(ajax.readyState == 4 && ajax.status == 200){
+			var array = JSON.parse(ajax.responseText);
+			var countKey = Object.keys(array).length;
+			str = "<br><button onclick='availRooms()'>Back</button><h3>Availability for tomorrow</h3>";
+			str += "<table><tr><th>Room Name</th><th>Start Time</th><th>End Time</th><th>Availability</th></tr>";
+			for (var i = 0; i < countKey; i++) {
+				if(array[i]["room_name"] == roomName){
+					str += "<tr>";
+					str += "<td>" + array[i]["room_name"] + "</td><td>" + array[i]["start_time"] + 
+					":00  </td><td>" + array[i]["end_time"] + ":00  </td><td>" + array[i]["available"]
+					+ "</td>";
+					str += "</tr>";	
+				}			
+			}
+			str += "</table>";
+			
+			output.innerHTML = str;
+			//document.getElementById("divToChange").innerHTML = array;
+		}
+	};
+}
+
+function showTheDayAfterTomorrowAvailability(roomName){
+	//var userInput = document.getElementById("input").value;
+	var ajax = new XMLHttpRequest();
+	ajax.open("GET", "showAvailability.php?date=day after tomorrow", true);
+	ajax.send();
+	ajax.onreadystatechange = function(){
+		if(ajax.readyState == 4 && ajax.status == 200){
+			var array = JSON.parse(ajax.responseText);
+			var countKey = Object.keys(array).length;
+			str = "<br><button onclick='availRooms()'>Back</button><h3>Availability for day after tomorrow</h3>";
+			str += "<table><tr><th>Room Name</th><th>Start Time</th><th>End Time</th><th>Availability</th></tr>";
+			for (var i = 0; i < countKey; i++) {
+				if(array[i]["room_name"] == roomName){
+					str += "<tr>";
+					str += "<td>" + array[i]["room_name"] + "</td><td>" + array[i]["start_time"] + 
+					":00  </td><td>" + array[i]["end_time"] + ":00  </td><td>" + array[i]["available"]
+					+ "</td>";
+					str += "</tr>";
+				}		
+			}
+			str += "</table>";
+			
+			output.innerHTML = str;
+			//document.getElementById("divToChange").innerHTML = array;
+		}
+	};
+}
+
+function showAllReservations(){
+	//var userInput = document.getElementById("input").value;
+	var ajax = new XMLHttpRequest();
+	ajax.open("GET", "showReservations.php", true);
+	ajax.send();
+	ajax.onreadystatechange = function(){
+		if(ajax.readyState == 4 && ajax.status == 200){
+			var array = JSON.parse(ajax.responseText);
+			var countKey = Object.keys(array).length;
+			str = "<br><button onclick='availRooms()'>Back</button><h3>All reservations</h3>";
+			str += "<table><tr><th>Room Name</th><th>Start Time</th><th>End Time</th><th>Date</th><th>Room Type</th</tr>";
+			for (var i = 0; i < countKey; i++) {
+				str += "<tr>";
+				str += "<td>" + array[i]["room_name"] + "</td><td>" + array[i]["start_time"] + 
+				":00  </td><td>" + array[i]["end_time"] + ":00  </td><td>" + array[i]["date"] + "</td><td>" +
+				array[i]["type"] + "</td>";
+				str += "</tr>";
+			}
+			str += "</table>";
+			
+			output.innerHTML = str;
+			//document.getElementById("divToChange").innerHTML = array;
+		}
+	};
+}
+</script>
+
+</body>
+</html>
+
+
+
+
+http://localhost/InSpirAVETest/
